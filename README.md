@@ -23,11 +23,22 @@ The source of truth is a **private repository on the company GitLab** (`repo.vir
 - **Installing via Claude Code/CLI**: can use the GitLab URL directly.
 - **Installing via Claude Desktop (org-wide)**: goes through the GitHub mirror, since that's the only path Claude Desktop supports for team-wide plugin distribution.
 
+## Connecting Confluence to Claude
+
+Only needed for the `create-confluence-documentation` skill — the two documentation skills work fine without it. This is a **personal setting**: every user who wants to publish documentation to Confluence themselves needs to do this once for their own account.
+
+1. Go to **Settings → Connectors** (in Claude.ai or the Claude Desktop app).
+2. Find **Atlassian** and click **Connect**.
+3. Sign in with your own Atlassian account and approve the requested permissions. This uses OAuth — your Atlassian password is never shared with Claude.
+4. If you have access to multiple Atlassian sites, pick the right one (`virtualsciences.atlassian.net`).
+5. Done. Claude now uses your own Confluence permissions whenever `create-confluence-documentation` creates or updates a page — never more or less than what you already have access to yourself.
+
 ## Step by step: adding the marketplace and generating your first diagram
 
 1. **Turn on Code execution and file creation.** Settings → Capabilities (Free, Pro, Max) or Organization settings → Skills (Team, Enterprise) — see "Plan requirements" above. Works on any plan, including Free.
 2. **Add the marketplace.** In Claude Desktop: Customize → Plugins → "+" → Add marketplace, and paste `https://github.com/FKoek/LCIT-Documentation`. (In Claude Code: `claude plugin marketplace add https://github.com/FKoek/LCIT-Documentation`.)
 3. **Install the plugin.** Find `integration-diagram-tools` in the marketplace and install it. This adds all three skills: `mulesoft-documentation-skill`, `frends-documentation-skill`, `create-confluence-documentation`.
+3. **Want to publish to Confluence?** Connect your Atlassian account once — see "Connecting Confluence to Claude" above.
 4. **Give Claude the integration to analyze.** On a paid plan, you can attach the customer's full integration folder as a workspace folder via Cowork; otherwise (or on Free), upload the specific flow-XML/JSON export file(s) directly in chat.
 5. **Ask for the diagram/description.** Type a prompt describing what you want — see "Example prompts" below. You don't need to invoke a skill by name; Claude picks the right one based on your request and the uploaded/attached content.
 6. **Review the output**, then optionally ask to publish it to Confluence (see the `create-confluence-documentation` example prompts).
