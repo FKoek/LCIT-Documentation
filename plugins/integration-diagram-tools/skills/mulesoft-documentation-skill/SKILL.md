@@ -2,12 +2,12 @@
 name: mulesoft-documentation-skill
 description: Genereer een Niveau 3 Integratieproces sequence diagram (Mermaid) en bijbehorende functionele beschrijving vanuit een bestaande Mulesoft-integratie. Gebruik deze skill altijd wanneer de gebruiker vraagt om een sequence diagram, integratiediagram, functionele beschrijving van een Mulesoft-integratie, of documentatie voor een Mulesoft-flow te genereren — ook als ze alleen "diagram voor deze integratie" of "documenteer deze flow" zeggen zonder het woord "Mermaid" of "Niveau 3" te noemen. Trigger ook wanneer de gebruiker Mulesoft XML-flows uploadt en vraagt om deze te analyseren, te visualiseren of te documenteren. Deze skill implementeert het door het Low Code Integration Team vastgestelde Niveau 3-diagramstandaard (sequence diagrams, geen flowcharts). Gebruik `frends-documentation-skill` in plaats hiervan voor Frends-integraties.
 metadata:
-  version: "1.3.0"
+  version: "1.1.2"
 ---
 
 # Mulesoft — Niveau 3: Integratieproces sequence diagram generator
 
-**Versie:** 1.3.0
+**Versie:** 1.1.2
 
 ## Taal
 
@@ -96,10 +96,6 @@ Loop altijd deze checklist af voordat je het resultaat presenteert:
 - [ ] Alle participants vooraf gedeclareerd met korte, logische afkortingen
 - [ ] Elke synchrone call heeft een bijbehorende response met statuscode
 - [ ] Activatie (`+`/`-`) consistent gebruikt bij synchrone calls
-- [ ] **Geen `-->>-` (deactivatie-shorthand) in meer dan één branch van dezelfde `alt`/`else` voor dezelfde participant** — dit crasht de Mermaid-render met "Trying to inactivate an inactive participant". Gebruik in dat geval gewone `-->>` pijlen in elke branch plus één losse `deactivate` ná de `end` (zie sectie 3.6 van de standards). Controleer dit specifiek bij elk `alt`/`else`-blok dat op een geactiveerde call volgt.
-- [ ] **Geen kale `;` in note- of labeltekst** — Mermaid behandelt een puntkomma als statement-terminator, ook midden in tekst, en knipt de rest van het diagram daarna stilzwijgend af (zie sectie 3.7 van de standards). Grep de opgeleverde mermaid-codeblokken op `;` buiten het `%%{init: ...}%%`-blok; vervang elke hit in note-/labeltekst door een em dash, komma of punt.
-- [ ] **Groen (`rect rgb(235, 255, 235)`) alleen voor de call die het Mule-landschap daadwerkelijk verlaat** (naar een DB, SAP, of een ander extern/backend-systeem) — elke call tussen je eigen Mule-API's (`-ea`/`-pa`/`-sa` onderling) is blauw (`rect rgb(235, 245, 255)`), ook al heet de aanroepende of ontvangende API "System API" (zie sectie 4 van de standards, en het canonieke voorbeeld in sectie 8). Controleer dit specifiek bij elke call naar een database of ander backend-systeem.
-- [ ] **Geen gedupliceerde aanroep in `alt succes`/`else fout` rond een uitstapje-call** — er is maar één aanroep; alleen het antwoord verschilt per pad (zie sectie 3.8 van de standards). Modelleer bij voorkeur helemaal geen `alt` per call — alleen als de gebruiker expliciet foutafhandeling vraagt of de flow-XML een echt afwijkend pad implementeert, en dan alleen als `alt` rond het *antwoord*, nooit rond de call zelf.
 - [ ] Elke processtap heeft een `note over` + `rect`-groepering
 - [ ] `alt` alleen bij een echt alternatief pad; anders `opt`
 - [ ] `loop` alleen bij echte iteratie over een lijst/collectie

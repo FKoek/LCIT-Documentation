@@ -24,8 +24,6 @@ Elke aparte Mulesoft-applicatie (elk `.xml`-project of elke duidelijk gescheiden
 
 Het gedeelde skelet (`../../shared/assets/example-skeleton.mmd`) gebruikt bewust platform-neutrale placeholders (`<intermediate-system-1>`, `<intermediate-system-2>`) omdat het ook door `frends-documentation-skill` wordt gebruikt. Vul die placeholders voor een Mulesoft-integratie in volgens de laag-conventie hierboven, bijv. `<intermediate-system-1>` → `sap_sa` (System API), `<intermediate-system-2>` → `sap_pa` (Process API).
 
-**Voordat je een aanroepend systeem als "de bron" documenteert: ga na of dat systeem zelf ook maar doorgeeft.** Zie sectie 3.9 van de standards voor de valkuil en het signaal (identieke endpoint-paden tussen twee lagen). De concrete Mulesoft-techniek: grep de workspace op de naam van de aanroepende API (bijv. `http-request-configuration-<api-naam>-internal`, of de listener-paden uit diens eigen `1-input-adapters-*.xml`) om te zien of een ander Mule-project díe API op zijn beurt aanroept. Herhaal dit tot je geen verdere aanroeper meer vindt — pas dat systeem (een scheduler, een queue-listener zonder eigen upstream-aanroeper, of een écht extern systeem) is de ware bron/participant.
-
 ## 3. Flow-elementen → sequence diagram-concepten
 
 | Mulesoft-element | Sequence diagram-vertaling |

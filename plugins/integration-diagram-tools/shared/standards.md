@@ -213,99 +213,6 @@ deactivate WMS
 ```
 
 
-## 3.6. Bekende valkuil: activatie (`-`) combineren met `alt`/`else`
-
-**Nooit** de `-->>-` deactivatie-shorthand gebruiken in **meer dan één branch** van dezelfde `alt`/`else` voor dezelfde participant. Mermaid houdt de activatie-stack lineair bij (top-naar-beneden over de hele diagramtekst, niet per branch) — zodra de eerste branch een participant deactiveert, telt Mermaid die participant al als inactief tegen de tijd dat het de `else`-branch inleest. De tweede `-->>-` op diezelfde participant crasht de render met **"Trying to inactivate an inactive participant (\<naam\>)"**. Dit is geen edge case: dit gebeurt bij elke `alt`/`else` waarin beide paden teruggaan naar dezelfde aanroeper met een geactiveerde responder.
-
-Fout (crasht):
-
-```
-A ->>+ B: request
-alt succes
-    B -->>- A: 200 OK
-else fout
-    B -->>- A: 500 Error
-end
-```
-
-Correct — gebruik gewone pijlen (`-->>`, zonder `-`) in **elke** branch, en zet daarna één losse `deactivate` na de `end`:
-
-```
-A ->>+ B: request
-alt succes
-    B -->> A: 200 OK
-else fout
-    B -->> A: 500 Error
-end
-deactivate B
-```
-
-Deze regel geldt voor elke branch-vorm die niet gegarandeerd exact één keer wordt doorlopen tijdens het lineair parsen: `alt`/`else`, en evengoed `opt` gevolgd door een pad ná de `opt` dat dezelfde participant nog deactiveert. Controleer dit expliciet vóór oplevering (zie de checklist in de SKILL.md's) — dit is meermaals de oorzaak geweest van een gebroken diagram in productie.
-
-
-## 3.7. Bekende valkuil: een kale puntkomma (`;`) in note- of labeltekst
-
-**Nooit** een kale `;` gebruiken als gewone leesteken binnen de vrije tekst van een `note over ...: <tekst>` of een message-label (bijv. `A ->> B: <tekst>`). Mermaid's sequence-diagram lexer behandelt `;` als een (optionele) statement-terminator, ook **midden in** note-/labeltekst — niet als letterlijke interpunctie. De parser knipt de tekst na de `;` stilzwijgend af en raakt daarna gedesynchroniseerd met de rest van het diagram. Dit uit zich meestal **niet** als een foutmelding bij de `;` zelf, maar als een verwarrende parse error die naar een volledig andere, onschuldig ogende regel verderop in het diagram wijst (typisch iets als "expecting arrow, got NEWLINE" bij de eerstvolgende `rect`/`note`/interactie) — waardoor de echte oorzaak makkelijk gemist wordt.
-
-Fout (crasht, foutmelding wijst naar een latere regel, niet naar deze):
-
-```
-note over A,B: Select the export dataset (paginated for region-a; single-shot for region-b)
-```
-
-Correct — vervang de `;` door een em dash, komma of punt:
-
-```
-note over A,B: Select the export dataset (paginated for region-a — single-shot for region-b)
-```
-
-Controleer dit expliciet vóór oplevering: grep de gegenereerde mermaid-codeblokken op `;` buiten het `%%{init: ...}%%`-configuratieblok (dat blok is JS/JSON-achtig en verdraagt een `;` prima) — elke andere hit in note- of labeltekst is een bug. Waar mogelijk, valideer het opgeleverde diagram met een echte Mermaid-parser (bijv. het npm-pakket `mermaid` samen met `jsdom`, `mermaid.parse(tekst)`) in plaats van alleen visueel of structureel (haakjes/`end`-balans) te controleren — die laatste controle mist deze foutklasse volledig. Ontdekt tijdens het genereren van een Level 3 diagram voor de elho-iplan-sa-integratie: twee notes gebruikten `;` als gewone Engelse interpunctie, waardoor precies dat ene diagram brak terwijl de andere drie (zonder `;` in hun tekst) prima renderden.
-
-
-## 3.8. Bekende valkuil: de call zelf dupliceren in `alt succes`/`else fout`
-
-Wanneer een synchrone call een succes- en foutpad heeft, verleidt sectie 3.5's `alt`-sjabloon ertoe om de **hele aanroep** (niet alleen het antwoord) in beide branches te herhalen. Dat is fout: er gebeurt in werkelijkheid maar **één** aanroep; alleen het *antwoord* op die aanroep verschilt per pad. Twee aanroepen tekenen suggereert dat de aanroeper het twee keer probeert, wat vrijwel nooit klopt.
-
-Fout (suggereert twee losse aanroepen):
-
-```
-alt succes
-    A ->>+ B: POST /orders
-    B -->> A: 200 OK
-else fout
-    A ->>+ B: POST /orders
-    B -->> A: 500 Error
-end
-```
-
-Correct — één aanroep, `alt` alleen op het antwoord (zie ook sectie 3.6 voor de bijbehorende activatie-regel):
-
-```
-A ->>+ B: POST /orders
-alt succes
-    B -->> A: 200 OK
-else fout
-    B -->> A: 500 Error
-end
-deactivate B
-```
-
-**Standaardkeuze: modelleer helemaal geen `alt succes`/`else fout` per uitstapje-call, tenzij de gebruiker expliciet foutafhandeling vraagt of de flow-XML/JSON een écht afwijkend statuscode-pad implementeert** (bijv. een specifieke error-branch die een ander vervolgpad triggert). De meeste geïntegreerde systemen doen niet meer dan "try/catch → generic error handler" — dat voegt niks toe aan het diagram om als `alt` te tonen, en het verhoogt het risico op deze fout. Toon in dat geval gewoon één call + één `200 ok`-respons (zoals in het canonieke voorbeeld van sectie 8), en beschrijf foutafhandeling in de bijbehorende functionele beschrijving (sectie 5 "Alternative paths and error handling" van `functional-description-template.md`) in plaats van in het diagram. Ontdekt tijdens het genereren van de elho-iplan-sa-documentatie: meerdere "uitstapje"-calls (naar iPlan en naar SAP) waren onnodig als `alt succes`/`else fout` met gedupliceerde aanroep gemodelleerd, terwijl geen van de brontraceerde flows die branching daadwerkelijk implementeerde.
-
-
-## 3.9. Bekende valkuil: stoppen bij de eerste caller in plaats van de ware bron-/doelsysteem
-
-Bij het bepalen van participants en het bron-/doelsysteem (stap 3 van het stappenplan in sectie 2) is het verleidelijk om te stoppen zodra je één aanroepend systeem hebt gevonden — bijvoorbeeld via een enkele grep naar de naam van de API die je aan het documenteren bent. Dat aanroepende systeem is vaak niet de ware bron: als het zelf ook een Mule- of Frends-applicatie is, kan het net zo goed een tussenlaag zijn die op zijn beurt door een ander systeem wordt aangeroepen.
-
-**Trace daarom altijd door tot je bij een systeem uitkomt dat zelf niets doorstuurt:** een scheduler, een extern systeem (ERP, portal, derde partij), of een queue-listener zonder eigen upstream-aanroeper. Herhaal de zoekactie ("wie roept dít systeem aan?") net zo vaak als nodig — zie de platform-specifieke technieken in sectie 2 van `mulesoft-analyse.md` respectievelijk `frends-analyse.md`.
-
-**Signaal om op te letten:** als laag B exact hetzelfde endpoint-pad blootstelt als het endpoint dat het zelf aanroept op laag C (bijv. beide `/v1/events/create-order`), is dat typisch een teken van doorgeef-gedrag (pass-through), niet van een bron. Zoek in dat geval altijd nog een laag verder voordat je B als "de bron" documenteert.
-
-**Controleer voordat je oplevert of je bevindingen uit de analyse ook daadwerkelijk in het document terechtgekomen zijn.** Het is mogelijk om tijdens het analyseren de juiste trigger te ontdekken (bijvoorbeeld een losse scheduler die een deel van de flow aanstuurt) en die vervolgens toch niet te verwerken in de uiteindelijke Trigger-/Systemen-sectie. Lees je concept-document na tegen al je bevindingen, niet alleen tegen de laatst gevonden informatie.
-
-Ontdekt tijdens het genereren van de elho-tms-ea-documentatie: een eerste analyse identificeerde `logistics-pa` als de bron van bijna alle events naar `tms-ea`, puur omdat een enkele grep naar de naam van de API die aanroeper opleverde. Een tweede trace (grep naar de naam van díe aanroeper in de rest van de workspace) toonde dat `logistics-pa` zelf slechts een doorgeefluik was — de werkelijke bron was SAP, via een tussenliggende Mule-applicatie (`sap-sa`). Bovendien was tijdens diezelfde analyse al correct vastgesteld dat een deel van de events (facturatie) juist wél door `logistics-pa` zelf werd geïnitieerd, via een eigen scheduler — die bevinding was echter niet doorgevoerd in het opgeleverde document.
-
-
 # **4. Notes en highlights**
 
 Gebruik notes om context of toelichting boven stappen te geven, en highlights (rect) om een reeks interacties visueel te groeperen. Gebruik dit om bepaalde soorten calls te weergeven en toe te lichten
@@ -320,8 +227,6 @@ Afgesproken kleuren:
 -main flow: 235, 245, 255
 
 -uitstapjes: 235, 255, 235
-
-**Wat telt als een "uitstapje" (groen)?** Alleen de call die het Mule-landschap daadwerkelijk verlaat en de fysieke bron-/doelsystemen raakt: een database (DB), een SOAP/REST-call naar SAP of een ander extern/backend-systeem, of een call naar een derde partij. Elke call **tussen je eigen Mule-API's** (Experience API ↔ Process API ↔ System API, dus elke `-ea`/`-pa`/`-sa`-onderlinge call) is **main flow (blauw)**, ook als de aanroepende of ontvangende API zelf "System API" heet — het is pas een uitstapje bij de allerlaatste hop die de Mule-laag verlaat. Let op: het voorbeeld direct hieronder in deze sectie toont ter illustratie van `rect`-gebruik een `order_pa ->>+ order_sa` call als groen, wat **strikt genomen inconsistent is** met het volledig uitgewerkte voorbeeld in sectie 8 (waar `customer_pa ->>+ sap_sa`, een vergelijkbare pa→sa-call, blauw is en alleen `sap_sa ->>+ sap` — de daadwerkelijke SAP-aanroep — groen is). Volg bij twijfel sectie 8: dat is het canonieke, volledig doorleefde voorbeeld. Deze inconsistentie is een bekende bron van fouten (zie sectie 3.8) — controleer bij elke `X-sa → DB`, `X-sa → extern systeem`-call expliciet of die daadwerkelijk groen staat, en of tussenliggende Mule-naar-Mule calls blauw blijven.
 
 Voorbeeld (zoals wij het toepassen):
 

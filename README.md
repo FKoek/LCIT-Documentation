@@ -1,13 +1,59 @@
-# claude-ai-skills
+# LCIT-Documentation
 
-A Claude plugin marketplace maintained by the Low Code Integration Team, distributing skills that analyze existing Mulesoft and Frends integrations and automatically generate standardized Level 3 sequence diagrams (Mermaid) and functional descriptions, in line with our team's documentation standards. Hosted on the company Gitlab.
+A Claude plugin marketplace maintained by the Low Code Integration Team (LCIT), distributing skills that analyze existing Mulesoft and Frends integrations and automatically generate standardized Level 3 sequence diagrams (Mermaid) and functional descriptions, in line with our team's documentation standards. This repo's name reflects that: `LCIT-Documentation`.
 
-This repo is the source for our own marketplace (similar in spirit to, for example, the Boomi Companion marketplace): users add the marketplace once and from then on get one-click updates, instead of manually downloading and re-uploading `.skill` files.
+This repo is the source for our own marketplace (`lcit-documentation`, similar in spirit to, for example, the Boomi Companion marketplace): users add the marketplace once and from then on get one-click updates, instead of manually downloading and re-uploading `.skill` files.
+
+## Plan requirements: what works where
+
+The marketplace and its skills work on **any Claude plan, including Free** — you just need to turn on **Code execution and file creation** under Settings → Capabilities (Customize → Skills after that). On Free, Pro, and Max, that's a personal toggle; on Team/Enterprise, an org owner enables it under Organization settings → Skills.
+
+**What does need a paid plan (Pro or higher): attaching a whole local folder.** Pointing Claude at an entire customer integration directory in one go — instead of uploading files one by one — is a **Cowork** feature, and Cowork itself is only available on paid plans (Pro, Max, Team, Enterprise), not on Free. So:
+
+- **On any plan, including Free**: install the marketplace and chat with the skills, uploading the relevant flow-XML/JSON file(s) individually.
+- **On a paid plan, via Cowork**: additionally attach the customer's whole integration folder as a workspace folder, so Claude can find the relevant files itself instead of you uploading them one at a time — much faster for anything beyond a single small file.
+
+## Hosting: GitLab source of truth + public GitHub mirror
+
+The source of truth is a **private repository on the company GitLab** (`repo.virtualsciences.nl`). It automatically mirrors to a **public GitHub repository**: [github.com/FKoek/LCIT-Documentation](https://github.com/FKoek/LCIT-Documentation).
+
+**Why the public mirror exists:** Claude Code (terminal) can add a marketplace from any git host, GitLab included. But org-wide distribution to the **Claude Desktop app** (Organization settings → Plugins, so the whole team gets the plugin offered automatically without adding it themselves) currently only supports **GitHub-synced marketplaces**, and that GitHub repo needs to be **publicly reachable**. The GitLab repo stays private and remains the actual source of truth; the GitHub side is a technically necessary, public mirror purely to make Desktop-wide distribution possible — not a second place where development happens.
+
+- **Development and review**: always in the GitLab repo.
+- **Installing via Claude Code/CLI**: can use the GitLab URL directly.
+- **Installing via Claude Desktop (org-wide)**: goes through the GitHub mirror, since that's the only path Claude Desktop supports for team-wide plugin distribution.
+
+## Step by step: adding the marketplace and generating your first diagram
+
+1. **Turn on Code execution and file creation.** Settings → Capabilities (Free, Pro, Max) or Organization settings → Skills (Team, Enterprise) — see "Plan requirements" above. Works on any plan, including Free.
+2. **Add the marketplace.** In Claude Desktop: Customize → Plugins → "+" → Add marketplace, and paste `https://github.com/FKoek/LCIT-Documentation`. (In Claude Code: `claude plugin marketplace add https://github.com/FKoek/LCIT-Documentation`.)
+3. **Install the plugin.** Find `integration-diagram-tools` in the marketplace and install it. This adds all three skills: `mulesoft-documentation-skill`, `frends-documentation-skill`, `create-confluence-documentation`.
+4. **Give Claude the integration to analyze.** On a paid plan, you can attach the customer's full integration folder as a workspace folder via Cowork; otherwise (or on Free), upload the specific flow-XML/JSON export file(s) directly in chat.
+5. **Ask for the diagram/description.** Type a prompt describing what you want — see "Example prompts" below. You don't need to invoke a skill by name; Claude picks the right one based on your request and the uploaded/attached content.
+6. **Review the output**, then optionally ask to publish it to Confluence (see the `create-confluence-documentation` example prompts).
+
+## Example prompts
+
+Copy-paste starting points — adjust the specifics to your situation:
+
+**Generating documentation (Mulesoft or Frends — Claude picks the right skill automatically):**
+- "Here's the flow XML for our SAP-to-Dollevoet transport order integration. Generate the Niveau 3 sequence diagram and functional description."
+- "I've attached the Frends export for the order-status webhook. Can you document this integration?"
+- "Analyze the integration folder I just attached and give me a sequence diagram for the customer master data sync flow."
+- "Here's an existing diagram — check it against our standards and correct anything that's wrong."
+
+**Publishing to Confluence:**
+- "Publish this documentation to Confluence."
+- "Can you turn the diagram and description above into a Confluence page under 'Diagram standaardisatie'?"
+- "Update the existing Confluence page for this integration with the new version of the diagram."
+
+**Combined, end to end:**
+- "Here's the customer's integration folder. Document the three flows related to order processing, and once I've reviewed them, publish them to Confluence."
 
 ## Contents
 
 ```
-claude-ai-skills/
+LCIT-Documentation/
 ├── .claude-plugin/
 │   └── marketplace.json
 └── plugins/
@@ -69,11 +115,7 @@ Users then don't need to do anything except accept the offered update.
 
 ## Installing a skill
 
-**Via the marketplace (recommended):**
-
-1. Add this marketplace once in Claude.
-2. Install `integration-diagram-tools` — this gives you `mulesoft-documentation-skill`, `frends-documentation-skill`, and `create-confluence-documentation`.
-3. Future versions (including updated standards) show up automatically as an update — one click, no reinstall needed.
+See "Step by step" above for the full walkthrough via the marketplace (recommended — you get automatic one-click updates, including updated standards).
 
 **Manual (alternative):** clone this repo and grab the `plugins/integration-diagram-tools` folder, and install it using the usual custom-plugin workflow. Note: this route doesn't get automatic updates — which is exactly why the marketplace is the preferred path.
 
@@ -91,4 +133,4 @@ Missing functionality, or need a whole new type of diagram/documentation (e.g. a
 
 - Confluence: [Diagram standaardisatie](https://virtualsciences.atlassian.net/wiki/spaces/ACR/pages/664436738/Diagram+standaardisatie) — all diagram levels (1 through 4).
 - Confluence: [Niveau 3: Integratieproces sequence diagram](https://virtualsciences.atlassian.net/wiki/spaces/ACR/pages/908328961/Niveau+3+Integratieproces+sequence+diagram) — the working document the standards are periodically copied from.
-- Confluence: [Automatisch Genereren](https://virtualsciences.atlassian.net/wiki/spaces/ACR/pages/1249738757/Automatisch+Genereren) — explainer on these skills for the wider team.
+- Confluence: [Automatisch genereren van integratiedocumentatie](https://virtualsciences.atlassian.net/wiki/spaces/ACR/pages/1249738757/Automatisch+genereren+van+integratiedocumentatie) — explainer on these skills for the wider team.

@@ -41,8 +41,6 @@ In Frends is elk **Process** (of duidelijk afgebakende Subprocess die naar een a
 
 Gebruik dezelfde afkortingsconventie als bij Mulesoft waar van toepassing (bijv. `-api` suffix voor een API-laag), of de bestaande naamgeving uit de Frends Environment als die er is.
 
-**Voordat je een aanroepend systeem als "de bron" documenteert: ga na of dat systeem zelf ook maar doorgeeft.** Zie sectie 3.9 van de standards voor de valkuil en het signaal (identieke endpoint-paden of Subprocess-namen tussen twee lagen). De concrete Frends-techniek: doorzoek andere Processen in de export/werkruimte op een `Call Subprocess`-shape of HTTP Task die naar het trigger-endpoint of de Environment-URL van dit proces verwijst. Herhaal dit tot je geen verdere aanroeper meer vindt — pas dat systeem (een scheduler, een message-trigger zonder eigen upstream-aanroeper, of een écht extern systeem) is de ware bron/participant.
-
 ## 3. Frends-elementen → sequence diagram-concepten
 
 | Frends-element | Sequence diagram-vertaling |
