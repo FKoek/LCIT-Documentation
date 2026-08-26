@@ -1,6 +1,6 @@
 # claude-ai-skills
 
-A Claude plugin marketplace maintained by the Low Code Integration Team, distributing skills that analyze existing Mulesoft and Frends integrations and automatically generate standardized Level 3 sequence diagrams (Mermaid) and functional descriptions, in line with our team's documentation standards.
+A Claude plugin marketplace maintained by the Low Code Integration Team, distributing skills that analyze existing Mulesoft and Frends integrations and automatically generate standardized Level 3 sequence diagrams (Mermaid) and functional descriptions, in line with our team's documentation standards. Hosted on the company Gitlab.
 
 This repo is the source for our own marketplace (similar in spirit to, for example, the Boomi Companion marketplace): users add the marketplace once and from then on get one-click updates, instead of manually downloading and re-uploading `.skill` files.
 
