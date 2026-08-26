@@ -38,10 +38,10 @@ Only needed for the `create-confluence-documentation` skill — the two document
 1. **Turn on Code execution and file creation.** Settings → Capabilities (Free, Pro, Max) or Organization settings → Skills (Team, Enterprise) — see "Plan requirements" above. Works on any plan, including Free.
 2. **Add the marketplace.** In Claude Desktop: Customize → Plugins → "+" → Add marketplace, and paste `https://github.com/FKoek/LCIT-Documentation`. (In Claude Code: `claude plugin marketplace add https://github.com/FKoek/LCIT-Documentation`.)
 3. **Install the plugin.** Find `integration-diagram-tools` in the marketplace and install it. This adds all three skills: `mulesoft-documentation-skill`, `frends-documentation-skill`, `create-confluence-documentation`.
-3. **Want to publish to Confluence?** Connect your Atlassian account once — see "Connecting Confluence to Claude" above.
-4. **Give Claude the integration to analyze.** On a paid plan, you can attach the customer's full integration folder as a workspace folder via Cowork; otherwise (or on Free), upload the specific flow-XML/JSON export file(s) directly in chat.
-5. **Ask for the diagram/description.** Type a prompt describing what you want — see "Example prompts" below. You don't need to invoke a skill by name; Claude picks the right one based on your request and the uploaded/attached content.
-6. **Review the output**, then optionally ask to publish it to Confluence (see the `create-confluence-documentation` example prompts).
+4. **Want to publish to Confluence?** Connect your Atlassian account once — see "Connecting Confluence to Claude" above.
+5. **Give Claude the integration to analyze.** On a paid plan, you can attach the customer's full integration folder as a workspace folder via Cowork; otherwise (or on Free), upload the specific flow-XML/JSON export file(s) directly in chat.
+6. **Ask for the diagram/description.** Type a prompt describing what you want — see "Example prompts" below. You don't need to invoke a skill by name; Claude picks the right one based on your request and the uploaded/attached content.
+7. **Review the output**, then optionally ask to publish it to Confluence (see the `create-confluence-documentation` example prompts).
 
 ## Example prompts
 
