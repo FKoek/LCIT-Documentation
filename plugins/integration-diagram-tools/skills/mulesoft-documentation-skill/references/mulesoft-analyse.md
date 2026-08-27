@@ -24,6 +24,14 @@ Elke aparte Mulesoft-applicatie (elk `.xml`-project of elke duidelijk gescheiden
 
 Het gedeelde skelet (`../../shared/assets/example-skeleton.mmd`) gebruikt bewust platform-neutrale placeholders (`<intermediate-system-1>`, `<intermediate-system-2>`) omdat het ook door `frends-documentation-skill` wordt gebruikt. Vul die placeholders voor een Mulesoft-integratie in volgens de laag-conventie hierboven, bijv. `<intermediate-system-1>` → `sap_sa` (System API), `<intermediate-system-2>` → `sap_pa` (Process API).
 
+### Meerdere instanties van dezelfde laag samenvatten in één participant
+
+Bij een groot landschap kunnen meerdere, verschillende API's van dezelfde laag naar hetzelfde component roepen — bijv. drie losse Experience API's (`sap-ea`, `crm-ea`, `wms-ea`) die allemaal dezelfde Process API aanroepen, en het voor de leesbaarheid van het diagram beter is om die drie samen te vatten tot één participant.
+
+**Verzin in dat geval geen samengevoegde naam die suggereert dat het één specifieke, benoembare API is** (bijv. `calling-ea`) — dat wekt ten onrechte de indruk dat er één concrete Experience API bestaat met die naam. Noem de participant in plaats daarvan naar het **type/de laag** die hij representeert: `experience-api` (of leesbaar: "Experience API"). Zo is voor iedereen die het diagram leest meteen duidelijk dat dit een generieke, samengevatte weergave van de laag is — geen specifieke, echt bestaande component. Vermeld in een `note` of in de functionele beschrijving welke concrete API's precies samengevat zijn, zodat die informatie niet verloren gaat.
+
+Dit geldt evengoed voor Process API's (`process-api`) en System API's (`system-api`) als die op dezelfde manier worden samengevat.
+
 ## 3. Flow-elementen → sequence diagram-concepten
 
 | Mulesoft-element | Sequence diagram-vertaling |
