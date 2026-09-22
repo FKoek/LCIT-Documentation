@@ -1,6 +1,6 @@
 # Niveau 3: Integratieproces sequence diagram
 
-<!-- Handmatig overgenomen vanaf Confluence-pagina "Niveau 3: Integratieproces sequence diagram" (space ACR, page id 908328961), Confluence-versie 36 (laatst bewerkt 2026-06-11), overgenomen op 2026-07-29. Dit bestand is de gedeelde bron voor mulesoft-documentation-skill en frends-documentation-skill; werk het ongeveer maandelijks handmatig bij vanaf Confluence (zie "Architectuur" in beide SKILL.md's) en werk deze regel dan mee bij met de nieuwe datum/versie. -->
+<!-- Handmatig overgenomen vanaf Confluence-pagina "Niveau 3: Integratieproces sequence diagram" (space ACR, page id 908328961), Confluence-versie 36 (laatst bewerkt 2026-06-11), overgenomen op 2026-07-29. Dit bestand is de gedeelde bron voor mulesoft-documentation-skill, frends-documentation-skill en boomi-documentation-skill; werk het ongeveer maandelijks handmatig bij vanaf Confluence (zie "Architectuur" in elke SKILL.md) en werk deze regel dan mee bij met de nieuwe datum/versie. -->
 
 # 1. Introductie
 

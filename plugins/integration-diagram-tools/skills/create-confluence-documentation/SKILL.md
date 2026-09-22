@@ -1,25 +1,25 @@
 ---
 name: create-confluence-documentation
-description: Publiceer integratiedocumentatie (functionele beschrijving + Mermaid sequence diagram) als een pagina in Confluence, volgens het vaste teamsjabloon en de geteste Mermaid-embedding-methode. Gebruik deze skill wanneer de gebruiker vraagt om gegenereerde documentatie (van `mulesoft-documentation-skill`, `frends-documentation-skill`, of aangeleverde tekst/diagrammen) naar Confluence te zetten, te publiceren, of daar bij te werken — bijv. "zet dit op Confluence", "maak hier een Confluence-pagina van", "publiceer deze documentatie". Trigger niet automatisch na het genereren van een diagram — alleen op expliciet verzoek van de gebruiker.
+description: Publiceer integratiedocumentatie (functionele beschrijving + Mermaid sequence diagram) als een pagina in Confluence, volgens het vaste teamsjabloon en de geteste Mermaid-embedding-methode. Gebruik deze skill wanneer de gebruiker vraagt om gegenereerde documentatie (van `mulesoft-documentation-skill`, `frends-documentation-skill`, `boomi-documentation-skill`, of aangeleverde tekst/diagrammen) naar Confluence te zetten, te publiceren, of daar bij te werken — bijv. "zet dit op Confluence", "maak hier een Confluence-pagina van", "publiceer deze documentatie". Trigger niet automatisch na het genereren van een diagram — alleen op expliciet verzoek van de gebruiker.
 metadata:
-  version: "1.1.0"
+  version: "1.2.0"
 ---
 
 # Documentatie publiceren naar Confluence
 
-**Versie:** 1.1.0
+**Versie:** 1.2.0
 
 ## Doel
 
-Deze skill neemt bestaande integratiedocumentatie (functionele beschrijving + Mermaid sequence diagram, meestal net gegenereerd door `mulesoft-documentation-skill` of `frends-documentation-skill`) en zet die als pagina in Confluence, volgens een vast sjabloon en met correct renderende Mermaid-diagrammen.
+Deze skill neemt bestaande integratiedocumentatie (functionele beschrijving + Mermaid sequence diagram, meestal net gegenereerd door `mulesoft-documentation-skill`, `frends-documentation-skill`, of `boomi-documentation-skill`) en zet die als pagina in Confluence, volgens een vast sjabloon en met correct renderende Mermaid-diagrammen.
 
-Deze skill is bewust losgetrokken uit de twee documentatie-skills: het wegschrijven naar Confluence was daar identiek, dus staat het nu op één plek in plaats van dubbel.
+Deze skill is bewust losgetrokken uit de documentatie-skills: het wegschrijven naar Confluence was daar identiek, dus staat het nu op één plek in plaats van dubbel.
 
 ## Wanneer gebruiken
 
 - De gebruiker vraagt expliciet om net gegenereerde documentatie naar Confluence te publiceren.
 - De gebruiker vraagt om een bestaande Confluence-pagina met integratiedocumentatie bij te werken.
-- De gebruiker levert zelf een functionele beschrijving + diagram aan (niet per se via de andere twee skills) en wil dat in Confluence-vorm.
+- De gebruiker levert zelf een functionele beschrijving + diagram aan (niet per se via de andere skills) en wil dat in Confluence-vorm.
 
 **Trigger dit nooit automatisch** na het genereren van een diagram door een van de andere skills — alleen op expliciet verzoek. Documentatie genereren en documentatie publiceren zijn bewust twee losse stappen.
 
@@ -35,7 +35,7 @@ Deze drie regels zijn eerder expliciet met het team afgesproken en gelden altijd
 
 ### Stap 1 — Verzamel de content
 
-Gebruik de functionele beschrijving en het Mermaid-diagram die al in het gesprek staan (van `mulesoft-documentation-skill`/`frends-documentation-skill`, of rechtstreeks aangeleverd door de gebruiker). Vraag na als een van beide ontbreekt of onvolledig is — genereer zelf geen nieuwe documentatie, dat is niet de taak van deze skill.
+Gebruik de functionele beschrijving en het Mermaid-diagram die al in het gesprek staan (van `mulesoft-documentation-skill`/`frends-documentation-skill`/`boomi-documentation-skill`, of rechtstreeks aangeleverd door de gebruiker). Vraag na als een van beide ontbreekt of onvolledig is — genereer zelf geen nieuwe documentatie, dat is niet de taak van deze skill.
 
 ### Stap 2 — Bepaal titel en locatie, en stel dit voor
 
@@ -57,7 +57,7 @@ Roep pas nú `createConfluencePage` (nieuwe pagina) of `updateConfluencePage` (b
 
 Deze skill houdt zijn eigen versienummer bij in de frontmatter (`metadata.version`) en in de leesbare `**Versie:**`-regel bovenaan dit document. Dit is vooral **informatief**.
 
-**Let op — dit is niet wat de marktplaats gebruikt om updates aan te bieden.** Deze skill wordt gedistribueerd als onderdeel van één plugin (`integration-diagram-tools`, samen met `mulesoft-documentation-skill` en `frends-documentation-skill`). De marktplaats kijkt naar het versienummer in `plugins/integration-diagram-tools/.claude-plugin/plugin.json` — dat is de enige plek die daadwerkelijk bepaalt of gebruikers een update aangeboden krijgen.
+**Let op — dit is niet wat de marktplaats gebruikt om updates aan te bieden.** Deze skill wordt gedistribueerd als onderdeel van één plugin (`integration-diagram-tools`, samen met `mulesoft-documentation-skill`, `frends-documentation-skill` en `boomi-documentation-skill`). De marktplaats kijkt naar het versienummer in `plugins/integration-diagram-tools/.claude-plugin/plugin.json` — dat is de enige plek die daadwerkelijk bepaalt of gebruikers een update aangeboden krijgen.
 
 **Bij elke aanpassing aan deze skill wordt het versienummer verplicht opgehoogd**, ook als daar niet expliciet om gevraagd wordt. Bepaal zelf, op basis van de aard van de wijziging, of het een patch, minor of major betreft (semver):
 
@@ -69,6 +69,6 @@ Werk bij elke wijziging beide plekken bij (frontmatter én de leesbare regel) zo
 
 ## Referentiebestanden
 
-- `../../shared/functional-description-template.md` — de secties die elke integratiepagina moet hebben, gedeeld met `mulesoft-documentation-skill` en `frends-documentation-skill`.
+- `../../shared/functional-description-template.md` — de secties die elke integratiepagina moet hebben, gedeeld met `mulesoft-documentation-skill`, `frends-documentation-skill` en `boomi-documentation-skill`.
 - `references/page-structure.md` — Confluence-specifieke aanvullingen op die structuur (paginatitel, de Diagram-sectie, meerdere flows op één pagina).
 - `references/confluence-embedding.md` — geteste, bevestigde kennis over hoe je een Mermaid-diagram correct in Confluence laat renderen, inclusief wat je juist *niet* moet doen (geen extra extensiemacro, geen handmatige `<details>`-wrapper).

@@ -8,7 +8,7 @@
     {
       "name": "integration-diagram-tools",
       "source": "./plugins/integration-diagram-tools",
-      "description": "Generate standardized Level 3 integration sequence diagrams (Mermaid) and functional descriptions from existing Mulesoft or Frends integrations, using platform-specific skills (mulesoft-documentation-skill, frends-documentation-skill) that share one central set of standards, plus a dedicated skill (create-confluence-documentation) for publishing that documentation to Confluence."
+      "description": "Generate standardized Level 3 integration sequence diagrams (Mermaid) and functional descriptions from existing Mulesoft, Frends, or Boomi integrations, using platform-specific skills (mulesoft-documentation-skill, frends-documentation-skill, boomi-documentation-skill) that share one central set of standards, plus a dedicated skill (create-confluence-documentation) for publishing that documentation to Confluence."
     }
   ]
 }

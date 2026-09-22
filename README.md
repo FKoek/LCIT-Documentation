@@ -1,6 +1,6 @@
 # LCIT-Documentation
 
-A Claude plugin marketplace maintained by the Low Code Integration Team (LCIT), distributing skills that analyze existing Mulesoft and Frends integrations and automatically generate standardized Level 3 sequence diagrams (Mermaid) and functional descriptions, in line with our team's documentation standards. This repo's name reflects that: `LCIT-Documentation`.
+A Claude plugin marketplace maintained by the Low Code Integration Team (LCIT), distributing skills that analyze existing Mulesoft, Frends, and Boomi integrations and automatically generate standardized Level 3 sequence diagrams (Mermaid) and functional descriptions, in line with our team's documentation standards. This repo's name reflects that: `LCIT-Documentation`.
 
 This repo is the source for our own marketplace (`lcit-documentation`, similar in spirit to, for example, the Boomi Companion marketplace): users add the marketplace once and from then on get one-click updates, instead of manually downloading and re-uploading `.skill` files.
 
@@ -37,7 +37,7 @@ Only needed for the `create-confluence-documentation` skill — the two document
 
 1. **Turn on Code execution and file creation.** Settings → Capabilities (Free, Pro, Max) or Organization settings → Skills (Team, Enterprise) — see "Plan requirements" above. Works on any plan, including Free.
 2. **Add the marketplace.** In Claude Desktop: Customize → Plugins → "+" → Add marketplace, and paste `https://github.com/FKoek/LCIT-Documentation`. (In Claude Code: `claude plugin marketplace add https://github.com/FKoek/LCIT-Documentation`.)
-3. **Install the plugin.** Find `integration-diagram-tools` in the marketplace and install it. This adds all three skills: `mulesoft-documentation-skill`, `frends-documentation-skill`, `create-confluence-documentation`.
+3. **Install the plugin.** Find `integration-diagram-tools` in the marketplace and install it. This adds all four skills: `mulesoft-documentation-skill`, `frends-documentation-skill`, `boomi-documentation-skill`, `create-confluence-documentation`.
 4. **Want to publish to Confluence?** Connect your Atlassian account once — see "Connecting Confluence to Claude" above.
 5. **Give Claude the integration to analyze.** On a paid plan, you can attach the customer's full integration folder as a workspace folder via Cowork; otherwise (or on Free), upload the specific flow-XML/JSON export file(s) directly in chat.
 6. **Ask for the diagram/description.** Type a prompt describing what you want — see "Example prompts" below. You don't need to invoke a skill by name; Claude picks the right one based on your request and the uploaded/attached content.
@@ -47,10 +47,11 @@ Only needed for the `create-confluence-documentation` skill — the two document
 
 Copy-paste starting points — adjust the specifics to your situation:
 
-**Generating documentation (Mulesoft or Frends — Claude picks the right skill automatically):**
+**Generating documentation (Mulesoft, Frends, or Boomi — Claude picks the right skill automatically):**
 - "Here's the flow XML for our SAP-to-Dollevoet transport order integration. Generate the Niveau 3 sequence diagram and functional description."
 - "I've attached the Frends export for the order-status webhook. Can you document this integration?"
 - "Analyze the integration folder I just attached and give me a sequence diagram for the customer master data sync flow."
+- "Document the Boomi process 'Order-to-Cash Main Flow' in our Acme-Orders folder on the platform."
 - "Here's an existing diagram — check it against our standards and correct anything that's wrong."
 
 **Publishing to Confluence:**
@@ -78,10 +79,11 @@ LCIT-Documentation/
         └── skills/
             ├── mulesoft-documentation-skill/       ← Mulesoft-only
             ├── frends-documentation-skill/         ← Frends-only
+            ├── boomi-documentation-skill/          ← Boomi-only
             └── create-confluence-documentation/    ← publishes generated documentation to Confluence
 ```
 
-One plugin, `integration-diagram-tools`, containing three skills:
+One plugin, `integration-diagram-tools`, containing four skills:
 
 ### `mulesoft-documentation-skill`
 
@@ -91,19 +93,23 @@ Generates a Level 3 sequence diagram and functional description from an existing
 
 Generates a Level 3 sequence diagram and functional description from an existing **Frends** integration (process export / C# Code Tasks). Has its own trigger phrasing and its own Frends-element analysis reference (`frends-analyse.md`).
 
+### `boomi-documentation-skill`
+
+Generates a Level 3 sequence diagram and functional description from an existing **Boomi** integration process. Has its own trigger phrasing and its own Boomi-element analysis reference (`boomi-analyse.md`). Reads a process either from an uploaded/pasted component XML or, when the `bc-integration:boomi-integration` skill is installed, directly from the Boomi platform via its read-only CLI tools (search + pull) — it never creates, pushes, deploys, or executes anything on the platform.
+
 ### `create-confluence-documentation`
 
 Publishes documentation generated by either of the two skills above (or supplied directly) as a page in Confluence, reusing the same shared `functional-description-template.md` structure (no separate, duplicated page template) plus the tested Mermaid-embedding method (plain code block — no extension macro, no manual collapsible wrapper). Always asks for explicit confirmation before creating or updating a page, and never decides the target location itself. This used to be duplicated inside both documentation skills; it's now a single, separately callable skill instead.
 
-**Why two separate skills instead of one that detects the platform:** each platform has its own analysis logic and its own vocabulary, so a dedicated, focused skill triggers more reliably than one skill that first has to guess the platform. A previous version of this marketplace combined both platforms into a single skill (and also included a `bottom-up` variant with an extra trigger-tracing step); that combined/bottom-up approach has been retired in favor of this simpler, split setup.
+**Why separate skills instead of one that detects the platform:** each platform has its own analysis logic and its own vocabulary, so a dedicated, focused skill triggers more reliably than one skill that first has to guess the platform. A previous version of this marketplace combined Mulesoft and Frends into a single skill (and also included a `bottom-up` variant with an extra trigger-tracing step); that combined/bottom-up approach has been retired in favor of this simpler, split setup.
 
-## Architecture: shared standard files, two platform skills
+## Architecture: shared standard files, three platform skills
 
-Both skills reference the **same** `standards.md`, `functional-description-template.md`, and `assets/example-skeleton.mmd`, which live at the plugin level (`plugins/integration-diagram-tools/shared/`) rather than being duplicated inside each skill folder — an earlier version of this marketplace did duplicate them, which was cleaned up. Each `SKILL.md` points to them with relative paths (e.g. `../../shared/standards.md`). This works because the whole plugin directory — including `shared/` — is copied as one unit when a user installs the plugin, so the relative paths always resolve.
+All three documentation skills reference the **same** `standards.md`, `functional-description-template.md`, and `assets/example-skeleton.mmd`, which live at the plugin level (`plugins/integration-diagram-tools/shared/`) rather than being duplicated inside each skill folder — an earlier version of this marketplace did duplicate them, which was cleaned up. Each `SKILL.md` points to them with relative paths (e.g. `../../shared/standards.md`). This works because the whole plugin directory — including `shared/` — is copied as one unit when a user installs the plugin, so the relative paths always resolve.
 
-This means **updating a shared file once updates both skills automatically** — there's no risk of copies drifting apart, because there's only one copy of each.
+This means **updating a shared file once updates all three skills automatically** — there's no risk of copies drifting apart, because there's only one copy of each.
 
-**Why `standards.md` isn't split per platform:** its content (opening config, block templates, arrow notation, common mistakes) is genuinely platform-agnostic — it describes how *any* sequence diagram should look, regardless of whether the source is Mulesoft or Frends. Splitting it would recreate the exact duplication problem this shared setup solves, for no benefit. Only content that's actually platform-specific (`mulesoft-analyse.md`, `frends-analyse.md`) stays separate, one copy per skill.
+**Why `standards.md` isn't split per platform:** its content (opening config, block templates, arrow notation, common mistakes) is genuinely platform-agnostic — it describes how *any* sequence diagram should look, regardless of whether the source is Mulesoft, Frends, or Boomi. Splitting it would recreate the exact duplication problem this shared setup solves, for no benefit. Only content that's actually platform-specific (`mulesoft-analyse.md`, `frends-analyse.md`, `boomi-analyse.md`) stays separate, one copy per skill.
 
 **No live connection to Confluence.** `standards.md` is a hardcoded, bundled file — no check, no sync, no prompting the user about updates.
 
@@ -116,9 +122,9 @@ Two places, two roles:
 
 This is a **deliberate, manual action, done by a single person, roughly once a month** (or sooner, if a relevant change lands on Confluence) — never automated:
 
-1. Copy the updated content from the Confluence page "Niveau 3: Integratieproces sequence diagram" into `plugins/integration-diagram-tools/shared/standards.md`. **One copy, and it applies to both skills automatically.**
-2. Check whether the change also affects the platform-specific reference files (`mulesoft-analyse.md`, `frends-analyse.md`) or the shared `functional-description-template.md`, and update those where needed.
-3. Bump the version number of **both** skills (`SKILL.md` frontmatter and the readable `**Version:**` line, in both `mulesoft-documentation-skill` and `frends-documentation-skill`) and of the plugin itself (`plugin.json`) — even if only the shared standards changed and neither skill's own instructions did, because the effective content both skills use has changed. This version bump is what the marketplace uses to offer the update.
+1. Copy the updated content from the Confluence page "Niveau 3: Integratieproces sequence diagram" into `plugins/integration-diagram-tools/shared/standards.md`. **One copy, and it applies to all three skills automatically.**
+2. Check whether the change also affects the platform-specific reference files (`mulesoft-analyse.md`, `frends-analyse.md`, `boomi-analyse.md`) or the shared `functional-description-template.md`, and update those where needed.
+3. Bump the version number of **all three** documentation skills (`SKILL.md` frontmatter and the readable `**Version:**` line, in `mulesoft-documentation-skill`, `frends-documentation-skill`, and `boomi-documentation-skill`) and of the plugin itself (`plugin.json`) — even if only the shared standards changed and no skill's own instructions did, because the effective content all three skills use has changed. This version bump is what the marketplace uses to offer the update.
 4. Validate and package.
 5. Commit and push to this repo, and publish the new version to the marketplace. Briefly describe what changed in the commit message.
 

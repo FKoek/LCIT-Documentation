@@ -1,13 +1,13 @@
 ---
 name: frends-documentation-skill
-description: Genereer een Niveau 3 Integratieproces sequence diagram (Mermaid) en bijbehorende functionele beschrijving vanuit een bestaande Frends-integratie. Gebruik deze skill altijd wanneer de gebruiker vraagt om een sequence diagram, integratiediagram, functionele beschrijving van een Frends-integratie, of documentatie voor een Frends-proces te genereren — ook als ze alleen "diagram voor deze integratie" of "documenteer deze flow" zeggen zonder het woord "Mermaid" of "Niveau 3" te noemen. Trigger ook wanneer de gebruiker Frends process-exports/JSON of C# Code Tasks uploadt en vraagt om deze te analyseren, te visualiseren of te documenteren. Deze skill implementeert het door het Low Code Integration Team vastgestelde Niveau 3-diagramstandaard (sequence diagrams, geen flowcharts). Gebruik `mulesoft-documentation-skill` in plaats hiervan voor Mulesoft-integraties.
+description: Genereer een Niveau 3 Integratieproces sequence diagram (Mermaid) en bijbehorende functionele beschrijving vanuit een bestaande Frends-integratie. Gebruik deze skill altijd wanneer de gebruiker vraagt om een sequence diagram, integratiediagram, functionele beschrijving van een Frends-integratie, of documentatie voor een Frends-proces te genereren — ook als ze alleen "diagram voor deze integratie" of "documenteer deze flow" zeggen zonder het woord "Mermaid" of "Niveau 3" te noemen. Trigger ook wanneer de gebruiker Frends process-exports/JSON of C# Code Tasks uploadt en vraagt om deze te analyseren, te visualiseren of te documenteren. Deze skill implementeert het door het Low Code Integration Team vastgestelde Niveau 3-diagramstandaard (sequence diagrams, geen flowcharts). Gebruik `mulesoft-documentation-skill` resp. `boomi-documentation-skill` in plaats hiervan voor Mulesoft- resp. Boomi-integraties.
 metadata:
-  version: "1.2.0"
+  version: "1.3.0"
 ---
 
 # Frends — Niveau 3: Integratieproces sequence diagram generator
 
-**Versie:** 1.2.0
+**Versie:** 1.3.0
 
 ## Taal
 
@@ -24,7 +24,7 @@ Deze skill analyseert een bestaande **Frends**-integratie-implementatie en gener
 
 Dit is de geautomatiseerde versie van het handmatige stappenplan uit de standards. De skill vervangt de standards niet — die blijven de bron van waarheid. Deze skill past ze toe.
 
-Voor Mulesoft-integraties: gebruik de losse `mulesoft-documentation-skill`. Deze twee skills zijn bewust gesplitst (elk platform heeft zijn eigen analyse-logica en triggerwoorden), maar delen dezelfde standards — zie "Architectuur" hieronder.
+Voor Mulesoft- resp. Boomi-integraties: gebruik de losse `mulesoft-documentation-skill` resp. `boomi-documentation-skill`. Deze drie skills zijn bewust gesplitst (elk platform heeft zijn eigen analyse-logica en triggerwoorden), maar delen dezelfde standards — zie "Architectuur" hieronder.
 
 ## Wanneer gebruiken
 
@@ -32,7 +32,7 @@ Voor Mulesoft-integraties: gebruik de losse `mulesoft-documentation-skill`. Deze
 - De gebruiker beschrijft een Frends-integratieproces in eigen woorden en wil dit gedocumenteerd zien volgens de standards.
 - De gebruiker vraagt om een bestaand Niveau 3-diagram van een Frends-proces te controleren, corrigeren of aan te vullen volgens de standards.
 
-Als er geen bestand is geüpload maar de gebruiker wel over "de integratie" praat, vraag om de flow-configuratie/code, of laat de gebruiker de stappen in de tekst beschrijven (bron-systeem, doel-systeem(en), endpoints, tussenliggende API's/services, foutafhandeling). Als onduidelijk is of het om Mulesoft of Frends gaat, vraag dit na — gok niet, en verwijs zo nodig naar `mulesoft-documentation-skill`.
+Als er geen bestand is geüpload maar de gebruiker wel over "de integratie" praat, vraag om de flow-configuratie/code, of laat de gebruiker de stappen in de tekst beschrijven (bron-systeem, doel-systeem(en), endpoints, tussenliggende API's/services, foutafhandeling). Als onduidelijk is of het om Mulesoft, Frends of Boomi gaat, vraag dit na — gok niet, en verwijs zo nodig naar `mulesoft-documentation-skill` of `boomi-documentation-skill`.
 
 ## Werkwijze (stappenplan)
 
@@ -110,7 +110,7 @@ Loop altijd deze checklist af voordat je het resultaat presenteert:
 
 Deze skill houdt zijn eigen versienummer bij in de frontmatter (`metadata.version`) en in de leesbare `**Versie:**`-regel bovenaan dit document. Dit versienummer gaat over wijzigingen aan déze skill specifiek (Frends-analyse, template, stappenplan) en is vooral **informatief** — het laat mensen die dit bestand lezen zien hoe volwassen/stabiel de skill is.
 
-**Let op — dit is niet wat de marktplaats gebruikt om updates aan te bieden.** Deze skill wordt gedistribueerd als onderdeel van één plugin (`integration-diagram-tools`, samen met `mulesoft-documentation-skill` en `create-confluence-documentation`). De marktplaats kijkt naar het versienummer in `plugins/integration-diagram-tools/.claude-plugin/plugin.json` — dat is de enige plek die daadwerkelijk bepaalt of gebruikers een update aangeboden krijgen. Zie "Architectuur" hieronder voor het volledige releaseproces.
+**Let op — dit is niet wat de marktplaats gebruikt om updates aan te bieden.** Deze skill wordt gedistribueerd als onderdeel van één plugin (`integration-diagram-tools`, samen met `mulesoft-documentation-skill`, `boomi-documentation-skill` en `create-confluence-documentation`). De marktplaats kijkt naar het versienummer in `plugins/integration-diagram-tools/.claude-plugin/plugin.json` — dat is de enige plek die daadwerkelijk bepaalt of gebruikers een update aangeboden krijgen. Zie "Architectuur" hieronder voor het volledige releaseproces.
 
 De gedeelde standards (`../../shared/standards.md`) hebben **geen eigen versienummer per skill** — zie "Architectuur" hieronder voor hoe een wijziging daaraan wordt doorgevoerd.
 
@@ -122,9 +122,9 @@ De gedeelde standards (`../../shared/standards.md`) hebben **geen eigen versienu
 
 Werk bij elke wijziging beide plekken bij (frontmatter én de leesbare regel) zodat ze nooit uit sync raken.
 
-## Architectuur: gedeelde standaardbestanden tussen twee skills
+## Architectuur: gedeelde standaardbestanden tussen drie skills
 
-Deze skill en `mulesoft-documentation-skill` zijn bewust **gesplitst** (elk platform heeft eigen analyse-logica en eigen triggerwoorden, dus een losse, gerichte skill werkt betrouwbaarder dan één skill die eerst het platform moet raden), maar delen alles wat platform-onafhankelijk is: de standards, de functionele-beschrijving-template, en het lege diagram-skeleton. Om te voorkomen dat die drie in twee kopieën uit elkaar gaan lopen, leven ze op **plugin-niveau**, niet in de map van deze skill zelf:
+Deze skill, `mulesoft-documentation-skill` en `boomi-documentation-skill` zijn bewust **gesplitst** (elk platform heeft eigen analyse-logica en eigen triggerwoorden, dus een losse, gerichte skill werkt betrouwbaarder dan één skill die eerst het platform moet raden), maar delen alles wat platform-onafhankelijk is: de standards, de functionele-beschrijving-template, en het lege diagram-skeleton. Om te voorkomen dat die drie in meerdere kopieën uit elkaar gaan lopen, leven ze op **plugin-niveau**, niet in de map van deze skill zelf:
 
 ```
 plugins/integration-diagram-tools/
@@ -134,27 +134,28 @@ plugins/integration-diagram-tools/
 │   └── assets/example-skeleton.mmd           ← idem
 └── skills/
     ├── mulesoft-documentation-skill/   (verwijst naar dezelfde bestanden)
-    └── frends-documentation-skill/     (deze skill, verwijst naar ../../shared/...)
+    ├── frends-documentation-skill/     (deze skill, verwijst naar ../../shared/...)
+    └── boomi-documentation-skill/      (verwijst naar dezelfde bestanden)
 ```
 
-Alleen wat écht platform-specifiek is — `frends-analyse.md` hier, `mulesoft-analyse.md` bij de andere skill — blijft los per skill.
+Alleen wat écht platform-specifiek is — `frends-analyse.md` hier, `mulesoft-analyse.md` resp. `boomi-analyse.md` bij de andere twee skills — blijft los per skill.
 
 Er is bewust **geen live koppeling met Confluence** — `shared/standards.md` is een hardcoded bestand dat gewoon gelezen wordt, geen aparte check, geen automatische sync.
 
 **Bijwerken van de standards is een bewuste, handmatige actie door één persoon, ongeveer eens per maand** (of eerder, bij een relevante Confluence-wijziging):
 
-1. Kopieer de actuele standards vanaf Confluence naar `plugins/integration-diagram-tools/shared/standards.md` — **één keer, dit werkt automatisch door voor beide skills** omdat ze naar hetzelfde bestand verwijzen.
-2. Werk zo nodig ook de platform-specifieke referentiebestanden bij (`frends-analyse.md` in deze skill, `mulesoft-analyse.md` in de andere) als de wijziging daar doorwerkt.
-3. Hoog het versienummer op van **beide** skills (`mulesoft-documentation-skill` én `frends-documentation-skill`) en van de plugin zelf (`plugin.json`) — ook als er verder niets aan een van beide skills is gewijzigd, want de effectieve inhoud (via de gedeelde standards) is voor beide veranderd. Dit is wat de marktplaats gebruikt om de update aan te bieden.
+1. Kopieer de actuele standards vanaf Confluence naar `plugins/integration-diagram-tools/shared/standards.md` — **één keer, dit werkt automatisch door voor alle drie de skills** omdat ze naar hetzelfde bestand verwijzen.
+2. Werk zo nodig ook de platform-specifieke referentiebestanden bij (`frends-analyse.md` in deze skill, `mulesoft-analyse.md`/`boomi-analyse.md` in de andere twee) als de wijziging daar doorwerkt.
+3. Hoog het versienummer op van **alle drie** de skills (`mulesoft-documentation-skill`, `frends-documentation-skill` én `boomi-documentation-skill`) en van de plugin zelf (`plugin.json`) — ook als er verder niets aan een van de skills is gewijzigd, want de effectieve inhoud (via de gedeelde standards) is voor alle drie veranderd. Dit is wat de marktplaats gebruikt om de update aan te bieden.
 4. Publiceer de nieuwe versie naar de marktplaats-repository.
 
 Gebruikers hoeven zelf niets te doen behalve op "update" klikken wanneer die beschikbaar is.
 
 ## Referentiebestanden
 
-- `../../shared/standards.md` — het volledige standards-document (bron van waarheid voor alle syntax- en stijlregels), gedeeld met `mulesoft-documentation-skill`, periodiek handmatig bijgewerkt vanaf Confluence door één persoon.
+- `../../shared/standards.md` — het volledige standards-document (bron van waarheid voor alle syntax- en stijlregels), gedeeld met `mulesoft-documentation-skill` en `boomi-documentation-skill`, periodiek handmatig bijgewerkt vanaf Confluence door één persoon.
 - `references/frends-analyse.md` — hoe Frends-process-elementen mappen naar sequence diagram-concepten, inclusief exportformaat-detectie (BPMN-XML vs JSON), de volledige trigger-taxonomie, het Exclusive/Inclusive Decision-onderscheid, en shape Type-codes voor betrouwbare herkenning. Grotendeels gebaseerd op kennis uit de `fc-integration:frends-ipaas-developer`-skill.
-- `../../shared/functional-description-template.md` — structuur voor de functionele beschrijving, gedeeld met `mulesoft-documentation-skill`.
+- `../../shared/functional-description-template.md` — structuur voor de functionele beschrijving, gedeeld met `mulesoft-documentation-skill` en `boomi-documentation-skill`.
 - `../../shared/assets/example-skeleton.mmd` — leeg startpunt met de verplichte openingsregels, klaar om in te vullen.
 
 Wil de gebruiker deze documentatie in Confluence hebben? Gebruik daarvoor de losse skill `create-confluence-documentation` — dat is bewust geen onderdeel van deze skill.
