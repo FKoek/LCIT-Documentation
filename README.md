@@ -25,7 +25,7 @@ The source of truth is a **private repository on the company GitLab** (`repo.vir
 
 ## Connecting Confluence to Claude
 
-Only needed for the `create-confluence-documentation` skill — the two documentation skills work fine without it. This is a **personal setting**: every user who wants to publish documentation to Confluence themselves needs to do this once for their own account.
+Only needed for the `create-confluence-documentation` skill — the other documentation skills work fine without it. This is a **personal setting**: every user who wants to publish documentation to Confluence themselves needs to do this once for their own account.
 
 1. Go to **Settings → Connectors** (in Claude.ai or the Claude Desktop app).
 2. Find **Atlassian** and click **Connect**.
@@ -33,13 +33,32 @@ Only needed for the `create-confluence-documentation` skill — the two document
 4. If you have access to multiple Atlassian sites, pick the right one (`virtualsciences.atlassian.net`).
 5. Done. Claude now uses your own Confluence permissions whenever `create-confluence-documentation` creates or updates a page — never more or less than what you already have access to yourself.
 
+## Boomi: reading live from the platform — why and how via Claude Code
+
+By default, `boomi-documentation-skill` works exactly like the other two documentation skills: you upload or paste the process XML (exported from Boomi) in chat, and there's nothing to configure — no key, no extra plugin, works on any plan as described in "Plan requirements" above.
+
+Optionally, the same skill can instead pull the process **directly from the Boomi platform**: you just name a process, component ID, folder, or platform URL, and Claude searches and downloads the process XML itself, without you exporting it by hand first. That path only works under two conditions, explained below: it has to go through **Claude Code**, and you need your **own Boomi platform API key**.
+
+**Why this is Claude Code-only.** The live-read path runs on the separate `bc-integration:boomi-integration` skill, which talks to the Boomi platform through a set of **read-only scripts** (`boomi-component-search.sh` to find the process, `boomi-component-pull.sh` to download the process XML and the components it references, and optionally `boomi-version-history.sh`/`boomi-component-diff.sh`). Those scripts run locally, against platform credentials stored in a `.env` file in your own working directory. That's a fundamentally different mechanism than the Confluence connector above, which uses OAuth and works the same in Claude.ai and Desktop. Running local scripts against a locally configured, personal API key is only possible in **Claude Code** (the terminal CLI) — Claude.ai and the Desktop app work with uploaded files or an attached Cowork folder, but don't execute local shell scripts against your own credentials. So the live-read option is Claude Code-only; the default route (upload/paste the process XML) keeps working on every plan and in every Claude surface.
+
+**Why you need your own key.** The `.env` with platform credentials (`BOOMI_API_URL`, `BOOMI_USERNAME`, `BOOMI_API_TOKEN`, `BOOMI_ACCOUNT_ID`) is **personal**: anyone who wants to use this live-read option sets it up with their **own** Boomi platform account, never a shared team credential. This is a materially bigger setup step than `mulesoft-documentation-skill` or `frends-documentation-skill` ever require — don't assume it "just works" without doing this yourself first.
+
+**How to set it up:**
+
+1. Install the `bc-integration` plugin in Claude Code. It includes, among others, the `boomi-integration`, `env-setup-guide`, and `configure-template-workspace` skills.
+2. Run the `bc-integration:env-setup-guide` skill — it walks you interactively through creating your own Boomi API token and writing it to your local `.env`.
+3. Verify the setup with `boomi-env-check.sh`. If that check fails, `boomi-documentation-skill` reports it and falls back to the default route (asks for the process XML as a file) instead of guessing.
+4. Ask Claude Code to document the process, naming the process, component ID, folder, or platform URL instead of uploading a file — e.g. "Document the Boomi process 'Order-to-Cash Main Flow' in our Acme-Orders folder on the platform."
+
+**Still strictly read-only.** Even through this live route, `boomi-documentation-skill` never modifies, deploys, undeploys, or executes anything on the Boomi platform — it only uses the read-only search/pull scripts from `bc-integration:boomi-integration`, never a script that creates, changes, deploys, or runs something. That's deliberately hard-coded into the skill itself, precisely because a personal platform key grants access to more than just documentation generation.
+
 ## Step by step: adding the marketplace and generating your first diagram
 
 1. **Turn on Code execution and file creation.** Settings → Capabilities (Free, Pro, Max) or Organization settings → Skills (Team, Enterprise) — see "Plan requirements" above. Works on any plan, including Free.
 2. **Add the marketplace.** In Claude Desktop: Customize → Plugins → "+" → Add marketplace, and paste `https://github.com/FKoek/LCIT-Documentation`. (In Claude Code: `claude plugin marketplace add https://github.com/FKoek/LCIT-Documentation`.)
 3. **Install the plugin.** Find `integration-diagram-tools` in the marketplace and install it. This adds all four skills: `mulesoft-documentation-skill`, `frends-documentation-skill`, `boomi-documentation-skill`, `create-confluence-documentation`.
 4. **Want to publish to Confluence?** Connect your Atlassian account once — see "Connecting Confluence to Claude" above.
-5. **Give Claude the integration to analyze.** On a paid plan, you can attach the customer's full integration folder as a workspace folder via Cowork; otherwise (or on Free), upload the specific flow-XML/JSON export file(s) directly in chat.
+5. **Give Claude the integration to analyze.** On a paid plan, you can attach the customer's full integration folder as a workspace folder via Cowork; otherwise (or on Free), upload the specific flow-XML/JSON export file(s) directly in chat. Want to read a Boomi process live from the platform instead? See "Boomi: reading live from the platform" above — that requires Claude Code and your own platform API key.
 6. **Ask for the diagram/description.** Type a prompt describing what you want — see "Example prompts" below. You don't need to invoke a skill by name; Claude picks the right one based on your request and the uploaded/attached content.
 7. **Review the output**, then optionally ask to publish it to Confluence (see the `create-confluence-documentation` example prompts).
 
